@@ -14,10 +14,15 @@ This tool provides the metric collection agents for the following New Relic plug
 
 ## Dependencies
 - A single t1.micro EC2 instance (in any region)
-- Ruby (>= 1.9.2)
+- Ruby (>= 2.2.0)
 - Rubygems (>= 1.3.7)
 - Bundler `gem install bundler`
 - Git
+
+### Additional Amazon Linux Dependencies
+ - libxml2-devel `yum install libxml2-devel`
+ - libxslt-devel `yum install libxslt-devel`
+ - Also add /usr/local/bin/ to your $PATH if not defined
 
 ## Install
 
