@@ -3,7 +3,7 @@ module NewRelicAWS
     class EBS < Base
       def initialize(access_key, secret_key, region, options)
         super(access_key, secret_key, region, options)
-        @ec2 = AWS::EC2.new(
+        @ec2 = Aws::EC2::Resource.new(
           :access_key_id => @aws_access_key,
           :secret_access_key => @aws_secret_key,
           :region => @aws_region
@@ -15,13 +15,33 @@ module NewRelicAWS
         if @tags
           tagged_volumes
         else
-          @ec2.volumes.filter('status', 'in-use')
+          @ec2.volumes({
+            filters: [
+              {
+                name: 'status',
+                values: ['in-use'],
+              }
+            ]
+            })
         end
       end
 
       def tagged_volumes
-        volumes = @ec2.volumes.filter('status', 'in-use').tagged(@tags).to_a
-        volumes.concat(@ec2.volumes.filter('status', 'in-use').tagged('Name', 'name').tagged_values(@tags).to_a)
+        volumes = []
+        @tags.each do |tag|
+          volumes.concat(@ec2.volumes({
+            filters: [
+              {
+                name: 'status',
+                values: ['in-use'],
+              },
+              {
+                name: "tag:#{tag}",
+                values: ['true', 'yes']
+              }
+            ]
+          }).to_a)
+        end
         volumes
       end
 
@@ -44,7 +64,7 @@ module NewRelicAWS
         data_points = []
         volumes.each do |volume|
           detailed = !!volume.iops
-          name_tag = volume.tags.detect { |tag| tag.first =~ /^name$/i }
+          name_tag = volume.tags.select{|tag| tag.key =~ /^name$/i}.first
           metric_list.each do |(metric_name, statistic, unit)|
             period = detailed ? 60 : 300
             time_offset = detailed ? 60 : 600
@@ -61,7 +81,7 @@ module NewRelicAWS
               :period => period,
               :start_time => (Time.now.utc - (time_offset + period)).iso8601,
               :end_time => (Time.now.utc - time_offset).iso8601,
-              :component_name => name_tag.nil? ? volume.id : "#{name_tag.last} (#{volume.id})"
+              :component_name => name_tag.nil? ? volume.id : "#{name_tag.value} (#{volume.id})"
             )
             NewRelic::PlatformLogger.debug("metric_name: #{metric_name}, statistic: #{statistic}, unit: #{unit}, response: #{data_point.inspect}")
             unless data_point.nil?
