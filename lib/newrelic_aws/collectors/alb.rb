@@ -27,7 +27,7 @@ module NewRelicAWS
           ['RequestCount',                    'Sum',      'Count',  0],
           ['RejectedConnectionCount',         'Sum',      'Count',  0],
           ['TargetConnectionErrorCount',      'Sum',      'Count',  0],
-          ['TargetResponseTime',              'Average',  'Milliseconds',  0],
+          ['TargetResponseTime',              'Average',  'Seconds',  0],
           ['TargetTLSNegotiationErrorCount',  'Sum',      'Count',  0],
           ['UnHealthyHostCount',              'Maximum',  'Count',  0]
         ]
