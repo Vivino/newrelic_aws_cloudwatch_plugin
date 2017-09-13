@@ -8,12 +8,12 @@ module NewRelicAWS
 
       def instance_ids
         return @instance_ids if @instance_ids
-        rds = AWS::RDS.new(
+        rds = Aws::RDS::Resource.new(
           :access_key_id => @aws_access_key,
           :secret_access_key => @aws_secret_key,
           :region => @aws_region
         )
-        rds.instances.map { |instance| instance.id }
+        rds.db_instances.map { |instance| instance.id }
       end
 
       def metric_list

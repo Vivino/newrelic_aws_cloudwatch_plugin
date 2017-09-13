@@ -2,12 +2,12 @@ module NewRelicAWS
   module Collectors
     class SNS < Base
       def topic_names
-        sns = AWS::SNS.new(
+        sns = Aws::SNS::Resource.new(
           :access_key_id => @aws_access_key,
           :secret_access_key => @aws_secret_key,
           :region => @aws_region
         )
-        sns.topics.map { |topic| topic.name }
+        sns.topics.map { |topic| topic.arn.split(/:/)[-1] }
       end
 
       def metric_list
