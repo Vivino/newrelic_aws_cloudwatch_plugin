@@ -2,36 +2,36 @@ module NewRelicAWS
   module Collectors
     class ALB < Base
       def load_balancers
-        alb = AWS::ELB.new(
+        alb = Aws::ElasticLoadBalancingV2::Client.new(
           :access_key_id => @aws_access_key,
           :secret_access_key => @aws_secret_key,
           :region => @aws_region
         )
-        alb.load_balancers.map { |load_balancer| load_balancer.name }
+        alb.describe_load_balancers.load_balancers.map { |load_balancer| load_balancer.load_balancer_arn.split(/:/)[-1].gsub("loadbalancer/", "") }
       end
 
-	def metric_list
-		[
-			["ActiveConnectionCount", 		"Average", 	"Count", 0],
-			["ClientTLSNegotiationErrorCount", 	"Sum", 		"Count", 0],
-			["ConsumedLBCapacityUnits", 		"Sum", 		"Count", 0],
-	                ["HealthyHostCount", 			"Maximum", 	"Count", 0],
-         		["HTTPCode_ELB_4XX", 			"Sum", 		"Count", 0],
-		        ["HTTPCode_ELB_5XX", 			"Sum", 		"Count", 0],
-			["HTTPCode_Target_2XX_Count", 		"Sum", 		"Count", 0],
-			["HTTPCode_Target_3XX_Count", 		"Sum", 		"Count", 0],
-			["HTTPCode_Target_4XX_Count", 		"Sum", 		"Count", 0],
-			["HTTPCode_Target_5XX_Count", 		"Sum", 		"Count", 0],
-			["NewConnectionCount", 			"Sum", 		"Count", 0],
-			["ProcessedBytes", 			"Average", 	"Bytes", 0],
-		        ["RequestCount", 			"Sum", 		"Count", 0],
-			["RejectedConnectionCount", 		"Sum", 		"Count", 0],
-			["TargetConnectionErrorCount", 		"Sum", 		"Count", 0],
-			["TargetResponseTime", 			"Average", 	"Milliseconds", 0],
-			["TargetTLSNegotiationErrorCount", 	"Sum", 		"Count", 0],
-          		["UnHealthyHostCount", 			"Maximum", 	"Count", 0],
-		]
-	end
+      def metric_list
+        [
+          ["ActiveConnectionCount",           "Average"   "Count", 0],
+          ["ClientTLSNegotiationErrorCount",  "Sum",      "Count", 0],
+          ["ConsumedLBCapacityUnits",         "Sum",      "Count", 0],
+          ["HealthyHostCount",                "Maximum"   "Count", 0],
+          ["HTTPCode_ELB_4XX",                "Sum",      "Count", 0],
+          ["HTTPCode_ELB_5XX",                "Sum",      "Count", 0],
+          ["HTTPCode_Target_2XX_Count",       "Sum",      "Count", 0],
+          ["HTTPCode_Target_3XX_Count",       "Sum",      "Count", 0],
+          ["HTTPCode_Target_4XX_Count",       "Sum",      "Count", 0],
+          ["HTTPCode_Target_5XX_Count",       "Sum",      "Count", 0],
+          ["NewConnectionCount",              "Sum",      "Count", 0],
+          ["ProcessedBytes",                  "Average"   "Bytes", 0],
+          ["RequestCount",                    "Sum",      "Count", 0],
+          ["RejectedConnectionCount",         "Sum",      "Count", 0],
+          ["TargetConnectionErrorCount",      "Sum",      "Count", 0],
+          ["TargetResponseTime",              "Average"   "Milliseconds", 0],
+          ["TargetTLSNegotiationErrorCount",  "Sum",      "Count", 0],
+          ["UnHealthyHostCount",              "Maximum"   "Count", 0],
+        ]
+      end
 
       def collect
         data_points = []
